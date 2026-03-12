@@ -56,7 +56,7 @@ router.get("/", async (req, res) => {
       doctor: doctorMap[c.doctor_id] || null,
     }))
 
-    res.json({ consultations: enriched })
+    res.json({ success: true, consultations: enriched })
 
   } catch (err) {
     console.error("Fetch consultations error:", err)
@@ -95,7 +95,7 @@ router.post("/", async (req, res) => {
 
     if (error) throw error
 
-    res.status(201).json({ consultation: data })
+    res.status(201).json({ success: true, consultation: data })
 
   } catch (err) {
     console.error("Create consultation error:", err)

@@ -30,6 +30,7 @@ router.get("/overview", async (req, res) => {
       ])
 
     res.json({
+      success: true,
       today: {
         patients: patients.filter(p =>
           p.created_at.startsWith(today)

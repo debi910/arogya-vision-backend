@@ -44,7 +44,7 @@ ${symptoms}
     )
 
     const aiText = response.data.choices[0].message.content
-    res.json({ ai_response: aiText })
+    res.json({ success: true, ai_response: aiText })
 
   } catch (err) {
     console.error("AI error:", err.response?.data || err.message)

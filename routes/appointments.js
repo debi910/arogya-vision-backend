@@ -25,7 +25,7 @@ router.get("/", async (req, res) => {
 
     if (error) throw error
 
-    res.json({ appointments: data })
+    res.json({ success: true, appointments: data })
   } catch (err) {
     console.error("Fetch appointments error:", err)
     res.status(500).json({ error: "Failed to fetch appointments" })
@@ -96,7 +96,7 @@ router.post("/", async (req, res) => {
 
     if (error) throw error
 
-    res.status(201).json({ appointment: data })
+    res.status(201).json({ success: true, appointment: data })
   } catch (err) {
     console.error("Create appointment error:", err)
     res.status(500).json({ error: "Failed to create appointment" })
