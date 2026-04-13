@@ -43,19 +43,20 @@ git pull origin main
 
 **⚠️ These SQL commands MUST run before features work!**
 
-### How to Apply:
+### ⭐ EASIEST WAY: Use Pre-Made SQL File
 
-1. **Open Supabase Dashboard**
-   - Go to https://supabase.com
-   - Select your project
-   - Click **"SQL Editor"** in left sidebar
+1. **Open this file:** `SQL_MIGRATIONS_COMPLETE.sql` (in your backend repo)
+2. **Copy ALL the code** (Ctrl+A, Ctrl+C)
+3. **Go to Supabase Dashboard** → SQL Editor
+4. **Paste the code** (Ctrl+V)
+5. **Click "Run"** ONE TIME
+6. **Done!** All 5 migrations run together
 
-2. **Create New Query**
-   - Click **"New Query"** button
-   - Paste SQL sections below
-   - Click **"Run"** button
+---
 
-3. **Run These SQL Commands** (one at a time):
+### Alternative: Run SQL Commands Individually
+
+If you prefer to run commands one-by-one, follow steps below:
 
 ---
 
@@ -135,9 +136,6 @@ ON prescriptions(tenant_id, created_at);
 ```sql
 ALTER TABLE consultations
 ADD COLUMN IF NOT EXISTS soap_notes JSONB DEFAULT '{"subjective":"","objective":"","assessment":"","plan":""}';
-
-CREATE INDEX IF NOT EXISTS idx_consultations_diagnosis 
-ON consultations USING GIN(to_tsvector('english', treatment_plan));
 ```
 
 ✅ Click "Run" → Wait for success
