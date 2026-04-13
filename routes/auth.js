@@ -148,4 +148,97 @@ router.post("/login", async (req, res) => {
   }
 })
 
+/**
+ * REGISTER USER (GENERAL - DOCTOR/RECEPTIONIST/ADMIN)
+ * POST /api/auth/register
+ */
+router.post("/register", async (req, res) => {
+  try {
+    const {
+      email,
+      password,
+      full_name,
+      role,
+      clinic_id,
+      clinic_name
+    } = req.body
+
+    if (!email || !password || !full_name || !role) {
+      return res.status(400).json({
+        error: "email, password, full_name and role are required"
+      })
+    }
+
+    if (!["doctor", "receptionist", "admin"].includes(role)) {
+      return res.status(400).json({
+        error: "role must be 'doctor', 'receptionist', or 'admin'"
+      })
+    }
+
+    // 1️⃣ Create Supabase AUTH user
+    const { data: authUser, error: authError } =
+      await supabaseAdmin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true
+      })
+
+    if (authError) throw authError
+
+    // 2️⃣ Use provided clinic_id or create clinic for user
+    let tenantId = clinic_id
+
+    if (!tenantId) {
+      // Create clinic
+      const { data: tenant, error: tenantError } = await supabase
+        .from("tenants")
+        .insert({
+          name: clinic_name || `${full_name}'s Clinic`,
+          phone: ""
+        })
+        .select()
+        .single()
+
+      if (tenantError) throw tenantError
+      tenantId = tenant.id
+    }
+
+    // 3️⃣ Create USER in app
+    const { error: userError } = await supabase
+      .from("users")
+      .insert({
+        auth_user_id: authUser.user.id,
+        email,
+        full_name,
+        role,
+        tenant_id: tenantId,
+        is_active: true
+      })
+
+    if (userError) throw userError
+
+    // 4️⃣ Issue JWT
+    const token = jwt.sign(
+      {
+        userId: authUser.user.id,
+        role,
+        tenant_id: tenantId
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    )
+
+    res.status(201).json({
+      success: true,
+      token,
+      role,
+      tenant_id: tenantId
+    })
+
+  } catch (err) {
+    console.error("Register error:", err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
 module.exports = router
